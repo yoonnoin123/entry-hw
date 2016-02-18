@@ -1,6 +1,6 @@
 char remainData;
 
-void setup(){
+void setup() {
   Serial.begin(9600);
   Serial.flush();
   initPorts();
@@ -19,7 +19,7 @@ void loop() {
       char c = Serial.read();
       updateDigitalPort(c);
     }
-  } 
+  }
   delay(15);
   sendPinValues();
   delay(10);
@@ -28,21 +28,21 @@ void loop() {
 void sendPinValues() {
   int pinNumber = 0;
   for (pinNumber = 0; pinNumber < 14; pinNumber++) {
-      sendDigitalValue(pinNumber);
+    sendDigitalValue(pinNumber);
   }
   for (pinNumber = 0; pinNumber < 6; pinNumber++) {
-      sendAnalogValue(pinNumber);
+    sendAnalogValue(pinNumber);
   }
-  
+
 }
 
 void updateDigitalPort (char c) {
   // first data
-  if (c>>7) {
+  if (c >> 7) {
     // is output
-    if ((c>>6) & 1) {
+    if ((c >> 6) & 1) {
       // is data end at this chunk
-      if ((c>>5) & 1) {
+      if ((c >> 5) & 1) {
         int port = (c >> 1) & B1111;
         setPortWritable(port);
         if (c & 1)
@@ -69,19 +69,19 @@ void updateDigitalPort (char c) {
 void sendAnalogValue(int pinNumber) {
   int value = analogRead(pinNumber);
   Serial.write(B11000000
-               | ((pinNumber & B111)<<3)
-               | ((value>>7) & B111));
+               | ((pinNumber & B111) << 3)
+               | ((value >> 7) & B111));
   Serial.write(value & B1111111);
 }
 
 void sendDigitalValue(int pinNumber) {
   if (digitalRead(pinNumber) == HIGH) {
     Serial.write(B10000000
-                 | ((pinNumber & B1111)<<2)
+                 | ((pinNumber & B1111) << 2)
                  | (B1));
   } else {
     Serial.write(B10000000
-               | ((pinNumber & B1111)<<2));
+                 | ((pinNumber & B1111) << 2));
   }
 }
 
